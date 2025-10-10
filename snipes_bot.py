@@ -72,7 +72,10 @@ def handle_message(event, say, client, logger):
     count = snipes_count[sender_id]
 
     # Send fun message
-    say(f"Snipped! {sender_name} has {count} snipes!")
+    if (count == 1):
+        say(f"Sniped! {sender_name} has {count} snipe!")
+    else:
+        say(say(f"Sniped! {sender_name} has {count} snipes!"))
 
     logger.info(f"{sender_name} sniped {len(tagged_users)} people. Total: {count}")
 
