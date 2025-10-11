@@ -102,6 +102,8 @@ The leaderboard features:
 - Auto-refreshes data from Supabase
 - Shows top 50 users
 
+**How to Snipe**: Tag someone in Slack AND attach a photo to the message! 📸
+
 ## Benefits of This Setup
 
 ✅ **Persistent Storage** - Data survives restarts and redeploys

@@ -10,6 +10,12 @@ This guide will help you deploy your Slack bot to Northflank using Supabase as t
    - Bot Token (`SLACK_BOT_TOKEN`)
    - Signing Secret (`SLACK_SIGNING_SECRET`)
    - App Token (`SLACK_APP_TOKEN`) with Socket Mode enabled
+   - **Required Bot Token Scopes**:
+     - `app_mentions:read`
+     - `channels:history`
+     - `chat:write`
+     - `files:read` (required to detect image attachments)
+     - `users:read`
 
 ## Step 1: Set up Supabase Database
 
@@ -137,7 +143,9 @@ In your Northflank service settings, add these environment variables:
 
 - Check that Socket Mode is enabled in your Slack app settings
 - Verify all environment variables are set correctly
+- Ensure your bot has the `files:read` scope (required to detect images)
 - Check Northflank logs for errors
+- Remember: snipes only count when a message has BOTH a user tag AND an image!
 
 ### Database connection errors
 

@@ -76,6 +76,21 @@ def handle_message(event, say, client, logger):
     if not tagged_users:
         return  # No one tagged → no snipes
 
+    # Check if message has an image attached
+    files = event.get("files", [])
+    has_image = False
+    
+    for file in files:
+        mimetype = file.get("mimetype", "")
+        # Check if it's an image (image/jpeg, image/png, image/gif, etc.)
+        if mimetype.startswith("image/"):
+            has_image = True
+            break
+    
+    # Only count as snipe if there's an image
+    if not has_image:
+        return  # No image attached → no snipes
+
     # Increment sender's snipe count in Supabase
     count = increment_snipe_count(sender_id, len(tagged_users))
 
@@ -88,7 +103,7 @@ def handle_message(event, say, client, logger):
     else:
         say(f"Sniped! {sender_name} has {count} snipes!")
 
-    logger.info(f"{sender_name} sniped {len(tagged_users)} people. Total: {count}")
+    logger.info(f"{sender_name} sniped {len(tagged_users)} people with an image. Total: {count}")
 
 # --- HTTP server with leaderboard ---
 class LeaderboardHandler(BaseHTTPRequestHandler):
@@ -254,6 +269,9 @@ class LeaderboardHandler(BaseHTTPRequestHandler):
                     border-top: 1px solid #e0e0e0;
                     background: #fafafa;
                 }}
+                .footer p {{
+                    margin: 0;
+                }}
                 @media (max-width: 600px) {{
                     .header h1 {{
                         font-size: 1.5em;
@@ -283,6 +301,9 @@ class LeaderboardHandler(BaseHTTPRequestHandler):
                             {rows}
                         </tbody>
                     </table>
+                </div>
+                <div class="footer">
+                    <p>📸 Tag someone with a photo to snipe!</p>
                 </div>
             </div>
         </body>

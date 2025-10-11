@@ -12,16 +12,18 @@ A fun Slack bot that tracks "snipes" - whenever someone tags another user in a m
 
 ## How It Works
 
-1. Someone tags a user in Slack: `Hey @john, check this out!`
+1. Someone tags a user in Slack **with a photo attached**: `Hey @john, check this out! 📸`
 2. Bot responds with their current snipe count: `Sniped! Alice has 5 snipes!`
 3. Leaderboard updates automatically showing the rankings
+
+**Note**: A snipe only counts if the message includes both a user tag AND an image attachment!
 
 ## Quick Preview
 
 ### Slack Bot in Action
 
 ```
-You: "Hey @alice @bob, look at this!"
+You: "Hey @alice @bob, look at this!" [with photo attached]
 Bot: "Sniped! You have 3 snipes!"
 ```
 
