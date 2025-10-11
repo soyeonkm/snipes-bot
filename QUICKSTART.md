@@ -85,6 +85,23 @@ See `DEPLOYMENT.md` for detailed deployment instructions.
 | `SUPABASE_URL`         | Supabase → Settings → API                        |
 | `SUPABASE_KEY`         | Supabase → Settings → API (use anon/public key)  |
 
+## Leaderboard Website
+
+Your bot now includes a **live leaderboard website**!
+
+When deployed, you can access:
+
+- **`/`** - Beautiful leaderboard showing top snipers with their counts
+- **`/health`** - Health check endpoint for monitoring
+
+The leaderboard features:
+
+- 🥇 🥈 🥉 Medals for top 3 positions
+- Real Slack user names (fetched from Slack API)
+- Responsive design that works on mobile
+- Auto-refreshes data from Supabase
+- Shows top 50 users
+
 ## Benefits of This Setup
 
 ✅ **Persistent Storage** - Data survives restarts and redeploys
@@ -92,6 +109,7 @@ See `DEPLOYMENT.md` for detailed deployment instructions.
 ✅ **Free Tier** - Both Supabase and Northflank offer generous free tiers
 ✅ **No File System** - Works perfectly with containerized deployments
 ✅ **Easy Monitoring** - View data directly in Supabase dashboard
+✅ **Public Leaderboard** - Share the URL with your team to see rankings!
 
 ## Need Help?
 

@@ -80,7 +80,7 @@ This guide will help you deploy your Slack bot to Northflank using Supabase as t
 
 4. **Configure runtime settings**:
    - Port: `8080`
-   - Health check: HTTP GET `/` (the dummy server will respond)
+   - Health check: HTTP GET `/health` (returns "Bot is running!")
 
 ### Option B: Deploy with Docker
 
@@ -121,9 +121,15 @@ In your Northflank service settings, add these environment variables:
    - Look for successful Slack connection messages
 
 3. **Test your bot**:
+
    - Go to your Slack workspace
    - Tag someone in a message: `Hello @someone!`
    - The bot should respond with the snipe count
+
+4. **View the leaderboard**:
+   - Get your Northflank service URL from the dashboard
+   - Visit the URL in your browser to see the live leaderboard
+   - Share the URL with your team!
 
 ## Troubleshooting
 
@@ -144,6 +150,13 @@ In your Northflank service settings, add these environment variables:
 - Check Dockerfile syntax
 - Verify all dependencies are in `requirements.txt`
 - Check build logs in Northflank
+
+### Leaderboard not showing data
+
+- Verify the Supabase connection is working (check logs)
+- Ensure there's at least one snipe in the database
+- Check that the Slack bot token has `users:read` permission
+- Try accessing `/health` endpoint first to verify server is running
 
 ## Monitoring
 
