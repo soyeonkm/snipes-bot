@@ -1,11 +1,11 @@
 import os
-import json
 import re
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from dotenv import load_dotenv
+from supabase import create_client, Client
 
 load_dotenv()
 
@@ -15,25 +15,38 @@ app = App(
     signing_secret=os.getenv("SLACK_SIGNING_SECRET")
 )
 
-# --- JSON persistence setup ---
-DATA_FILE = "snipes_data.json"
+# --- Supabase setup ---
+supabase_url = os.getenv("SUPABASE_URL")
+supabase_key = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(supabase_url, supabase_key)
 
-def load_snipes():
-    """Load snipe counts from JSON file."""
-    if not os.path.exists(DATA_FILE):
-        return {}
-    with open(DATA_FILE, "r") as f:
-        try:
-            return json.load(f)
-        except json.JSONDecodeError:
-            return {}
+def get_snipe_count(user_id):
+    """Get snipe count for a user from Supabase."""
+    try:
+        response = supabase.table("snipes").select("count").eq("user_id", user_id).execute()
+        if response.data and len(response.data) > 0:
+            return response.data[0]["count"]
+        return 0
+    except Exception as e:
+        print(f"Error fetching snipe count for {user_id}: {e}")
+        return 0
 
-def save_snipes():
-    """Save snipe counts to JSON file."""
-    with open(DATA_FILE, "w") as f:
-        json.dump(snipes_count, f, indent=2)
-
-snipes_count = load_snipes()
+def increment_snipe_count(user_id, increment_by=1):
+    """Increment snipe count for a user in Supabase."""
+    try:
+        current_count = get_snipe_count(user_id)
+        new_count = current_count + increment_by
+        
+        # Upsert the record (insert or update)
+        supabase.table("snipes").upsert({
+            "user_id": user_id,
+            "count": new_count
+        }).execute()
+        
+        return new_count
+    except Exception as e:
+        print(f"Error updating snipe count for {user_id}: {e}")
+        return current_count
 
 # --- Helper functions ---
 def get_user_name(client, user_id):
@@ -63,19 +76,17 @@ def handle_message(event, say, client, logger):
     if not tagged_users:
         return  # No one tagged → no snipes
 
-    # Increment sender's snipe count
-    snipes_count[sender_id] = snipes_count.get(sender_id, 0) + len(tagged_users)
-    save_snipes()  # persist the updated data
+    # Increment sender's snipe count in Supabase
+    count = increment_snipe_count(sender_id, len(tagged_users))
 
-    # Get sender’s name from Slack
+    # Get sender's name from Slack
     sender_name = get_user_name(client, sender_id)
-    count = snipes_count[sender_id]
 
     # Send fun message
-    if (count == 1):
+    if count == 1:
         say(f"Sniped! {sender_name} has {count} snipe!")
     else:
-        say(say(f"Sniped! {sender_name} has {count} snipes!"))
+        say(f"Sniped! {sender_name} has {count} snipes!")
 
     logger.info(f"{sender_name} sniped {len(tagged_users)} people. Total: {count}")
 

@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment files
+.env
+
+# Data files (not needed in Docker image)
+snipes_data.json
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!DEPLOYMENT.md
+
+# Migration script (run locally before deployment)
+migrate_to_supabase.py
+
+# OS files
+.DS_Store
+Thumbs.db
+
