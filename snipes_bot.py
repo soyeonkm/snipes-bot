@@ -31,7 +31,7 @@ def get_snipe_count(user_id):
         print(f"Error fetching snipe count for {user_id}: {e}")
         return 0
 
-def increment_snipe_count(user_id, increment_by=1):
+def increment_snipe_count(client, user_id, increment_by=1):
     """Increment snipe count for a user in Supabase."""
     try:
         current_count = get_snipe_count(user_id)
@@ -40,7 +40,8 @@ def increment_snipe_count(user_id, increment_by=1):
         # Upsert the record (insert or update)
         supabase.table("snipes").upsert({
             "user_id": user_id,
-            "count": new_count
+            "count": new_count,
+            "username": get_user_name(client, user_id)
         }).execute()
         
         return new_count
@@ -92,7 +93,7 @@ def handle_message(event, say, client, logger):
         return  # No image attached → no snipes
 
     # Increment sender's snipe count in Supabase
-    count = increment_snipe_count(sender_id, len(tagged_users))
+    count = increment_snipe_count(client, sender_id, len(tagged_users))
 
     # Get sender's name from Slack
     sender_name = get_user_name(client, sender_id)
