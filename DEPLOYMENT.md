@@ -220,3 +220,19 @@ print("Migration complete!")
 ```
 
 Run this script locally before deploying to Northflank.
+
+## Keeping Supabase Alive (Heartbeat)
+
+If you're using a free Supabase project, it may be paused after a period of inactivity. To prevent this, a heartbeat script (`heartbeat.py`) is included.
+
+To set this up on Northflank:
+
+1. In your Northflank project dashboard, click **Create** and select **Cron Job**.
+2. **Source**: Connect the same GitHub repository you used for your main service.
+3. **Build settings**: Use the same `Dockerfile` as your main service.
+4. **Cron schedule**: Set it to run periodically, for example every 4 days: `0 0 */4 * *`.
+5. **Command**: Override the default startup command and enter: `python heartbeat.py`
+6. **Environment**: Link the same environment variables (specifically `SUPABASE_URL` and `SUPABASE_KEY`) or add them manually.
+7. Click **Create Cron Job**.
+
+This will automatically ping your database on schedule and prevent it from going to sleep!
