@@ -13,6 +13,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY snipes_bot.py .
 
+# Copies ALL files from your GitHub repo into the /app directory
+COPY heartbeat.py .
+
 # Expose port (Northflank will set PORT env var)
 EXPOSE 8080
 
