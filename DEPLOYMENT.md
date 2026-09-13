@@ -223,16 +223,42 @@ Run this script locally before deploying to Northflank.
 
 ## Keeping Supabase Alive (Heartbeat)
 
-If you're using a free Supabase project, it may be paused after a period of inactivity. To prevent this, a heartbeat script (`heartbeat.py`) is included.
+If you're using a free Supabase project, it may be paused after a period of inactivity. To prevent this, a heartbeat script (`heartbeat.py`) inserts a row into a `heartbeats` table on a schedule. It runs as a separate Northflank Cron Job built from the same `Dockerfile`, which copies all application code (including `heartbeat.py`) into `/app`.
 
-To set this up on Northflank:
+### 1. Create the `heartbeats` table
+
+In the Supabase SQL Editor, run:
+
+```sql
+CREATE TABLE IF NOT EXISTS heartbeats (
+  id BIGSERIAL PRIMARY KEY,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+```
+
+If Row Level Security is enabled on this table, add a policy that allows inserts with your anon key, or the heartbeat will fail.
+
+### 2. Create the Cron Job on Northflank
 
 1. In your Northflank project dashboard, click **Create** and select **Cron Job**.
-2. **Source**: Connect the same GitHub repository you used for your main service.
-3. **Build settings**: Use the same `Dockerfile` as your main service.
+2. **Source**: Connect the same GitHub repository and branch (`master`) used by your main service.
+3. **Build settings**: Build type Dockerfile, Dockerfile path `/Dockerfile`, build context `/`.
 4. **Cron schedule**: Set it to run periodically, for example every 4 days: `0 0 */4 * *`.
-5. **Command**: Override the default startup command and enter: `python heartbeat.py`
-6. **Environment**: Link the same environment variables (specifically `SUPABASE_URL` and `SUPABASE_KEY`) or add them manually.
+5. **CMD override**: Enter the absolute path: `python /app/heartbeat.py`
+   - Do not use `python heartbeat.py`. Northflank may start the container in `/workspace` instead of `/app`, which fails with `can't open file '/workspace/heartbeat.py'`.
+6. **Environment**: Add `SUPABASE_URL` and `SUPABASE_KEY` (same values as the main service).
 7. Click **Create Cron Job**.
 
-This will automatically ping your database on schedule and prevent it from going to sleep!
+### 3. Build, deploy, and verify
+
+1. Under **Builds**, wait for the build of your latest commit to succeed.
+2. Click **Deploy** on that build. The job keeps running the previously deployed image until you do this.
+3. Under **Runs**, trigger a manual run and open its logs. You should see `Heartbeat sent successfully.`
+4. Confirm a new row appeared in the `heartbeats` table in Supabase.
+
+### Heartbeat troubleshooting
+
+- **`can't open file '.../heartbeat.py'`**: Set the CMD override to `python /app/heartbeat.py`. If it persists, check that the deployed build is from a commit where the `Dockerfile` uses `COPY . .`.
+- **Build fails with `failed to resolve source metadata for docker.io/library/python:3.11-slim`**: Northflank's image mirror or Docker Hub had a temporary problem. Click **Rebuild**. If it keeps failing, change the first line of the `Dockerfile` to `FROM public.ecr.aws/docker/library/python:3.11-slim`.
+- **Run shows success but no row appears**: The script logs errors but still exits with code 0. Read the run logs for `Error sending heartbeat` or a missing `SUPABASE_URL`/`SUPABASE_KEY` message.
+- **New commits don't reach the job**: Enable automatic builds for `master` under **Build options**, and remember to deploy each new build.
