@@ -50,7 +50,8 @@ See **[QUICKSTART.md](QUICKSTART.md)** for setup instructions.
 2. Configure Slack app with Socket Mode
 3. Set environment variables
 4. Deploy to Northflank
-5. Share leaderboard URL with team!
+5. (Optional) Set up the heartbeat Cron Job to keep free Supabase projects awake
+6. Share leaderboard URL with team!
 
 ## Tech Stack
 
@@ -84,6 +85,12 @@ CREATE TABLE snipes (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Used by heartbeat.py
+CREATE TABLE heartbeats (
+  id BIGSERIAL PRIMARY KEY,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
 ```
 
 ## Development
@@ -112,7 +119,7 @@ python migrate_to_supabase.py
 
 ## Deployment
 
-See **[DEPLOYMENT.md](DEPLOYMENT.md)** for detailed deployment instructions for Northflank and other platforms.
+See **[DEPLOYMENT.md](DEPLOYMENT.md)** for detailed deployment instructions for Northflank and other platforms, including the heartbeat Cron Job (run with `python /app/heartbeat.py`).
 
 ## Project Structure
 
@@ -123,6 +130,7 @@ See **[DEPLOYMENT.md](DEPLOYMENT.md)** for detailed deployment instructions for 
 ├── Dockerfile             # Container configuration
 ├── .dockerignore          # Docker ignore rules
 ├── env.example            # Environment variables template
+├── heartbeat.py           # Supabase keep-alive ping (Northflank Cron Job)
 ├── migrate_to_supabase.py # Migration script
 ├── README.md              # This file
 ├── QUICKSTART.md          # Quick setup guide

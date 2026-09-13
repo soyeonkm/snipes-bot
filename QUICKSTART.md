@@ -75,6 +75,10 @@ Test in Slack by tagging someone. The snipe count should now be stored in Supaba
 
 See `DEPLOYMENT.md` for detailed deployment instructions.
 
+### 6. (Optional) Keep Supabase Awake
+
+Free Supabase projects pause when idle. Create a `heartbeats` table and a Northflank Cron Job that runs `python /app/heartbeat.py` on a schedule. Full steps are in the "Keeping Supabase Alive (Heartbeat)" section of `DEPLOYMENT.md`.
+
 ## Environment Variables You Need
 
 | Variable               | Where to Get It                                  |
