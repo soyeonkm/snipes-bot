@@ -262,3 +262,14 @@ If Row Level Security is enabled on this table, add a policy that allows inserts
 - **Build fails with `failed to resolve source metadata for docker.io/library/python:3.11-slim`**: Northflank's image mirror or Docker Hub had a temporary problem. Click **Rebuild**. If it keeps failing, change the first line of the `Dockerfile` to `FROM public.ecr.aws/docker/library/python:3.11-slim`.
 - **Run shows success but no row appears**: The script logs errors but still exits with code 0. Read the run logs for `Error sending heartbeat` or a missing `SUPABASE_URL`/`SUPABASE_KEY` message.
 - **New commits don't reach the job**: Enable automatic builds for `master` under **Build options**, and remember to deploy each new build.
+
+## Weekly Leaderboard Summary
+
+`weekly_summary.py` posts the top 10 all-time leaderboard to a Slack channel. Run it as a Northflank Cron Job the same way as the heartbeat:
+
+1. **Cron schedule**: e.g. Mondays at 9am UTC: `0 9 * * 1`.
+2. **CMD override**: `python /app/weekly_summary.py`
+3. **Environment**: `SLACK_BOT_TOKEN`, `SUPABASE_URL`, `SUPABASE_KEY`, and `SLACK_CHANNEL_ID` (right-click the channel → View channel details → copy the ID at the bottom).
+4. Invite the bot to that channel (`/invite @your-bot`), or the post fails with `not_in_channel`.
+
+Unlike the heartbeat, this script exits non-zero on failure, so failed runs show as failed in Northflank.
