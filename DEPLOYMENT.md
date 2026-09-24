@@ -269,7 +269,7 @@ If Row Level Security is enabled on this table, add a policy that allows inserts
 
 1. **Cron schedule**: e.g. Mondays at 9am UTC: `0 9 * * 1`.
 2. **CMD override**: `python /app/weekly_summary.py`
-3. **Environment**: `SLACK_BOT_TOKEN`, `SUPABASE_URL`, `SUPABASE_KEY`, and `SLACK_CHANNEL_ID` (right-click the channel → View channel details → copy the ID at the bottom).
-4. Invite the bot to that channel (`/invite @your-bot`), or the post fails with `not_in_channel`.
+3. **Environment**: `SLACK_BOT_TOKEN`, `SUPABASE_URL`, `SUPABASE_KEY`, and `SLACK_CHANNEL_ID` set to the channel where the bot posts snipes (right-click the channel → View channel details → copy the ID at the bottom).
+4. The bot must be a member of that channel, or the post fails with `not_in_channel`. It already is if it replies to snipes there.
 
 Unlike the heartbeat, this script exits non-zero on failure, so failed runs show as failed in Northflank.
