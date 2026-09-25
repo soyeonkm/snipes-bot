@@ -273,3 +273,5 @@ If Row Level Security is enabled on this table, add a policy that allows inserts
 4. Invite the bot to that channel (`/invite @your-bot`), or the post fails with `not_in_channel`.
 
 Unlike the heartbeat, this script exits non-zero on failure, so failed runs show as failed in Northflank.
+
+To post the leaderboard on demand, mention the bot with `@snipesbot /leaderboard` in any channel it's in. This needs the `app_mention` bot event enabled under **Event Subscriptions** in your Slack app settings (reinstall the app if Slack asks).
