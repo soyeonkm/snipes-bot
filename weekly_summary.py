@@ -13,12 +13,12 @@ def fetch_top(supabase):
 def build_message(rows):
     """Format leaderboard rows (ordered by count desc) as a Slack message."""
     if not rows:
-        return "🎯 *Weekly Snipes Leaderboard*\nNothing yet! Start sniping people!"
+        return "🎯 *Snipes Leaderboard*\nNothing yet! Start sniping people!"
     lines = [
         f"{MEDALS.get(i, f'{i}.')} {row.get('username') or row['user_id']}: *{row['count']}* {'snipe' if row['count'] == 1 else 'snipes'}"
         for i, row in enumerate(rows, 1)
     ]
-    return "🎯 *Weekly Snipes Leaderboard*\n" + "\n".join(lines) + "\n\n📸 Tag someone with a photo to snipe!"
+    return "🎯 *Snipes Leaderboard*\n" + "\n".join(lines)
 
 def send_summary():
     load_dotenv()
