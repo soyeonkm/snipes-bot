@@ -6,6 +6,7 @@ from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from dotenv import load_dotenv
 from supabase import create_client, Client
+from weekly_summary import fetch_top, build_message
 
 load_dotenv()
 
@@ -105,6 +106,12 @@ def handle_message(event, say, client, logger):
         say(f"Sniped! {sender_name} has {count} snipes!")
 
     logger.info(f"{sender_name} sniped {len(tagged_users)} people with an image. Total: {count}")
+
+# --- "@snipesbot /leaderboard" posts the weekly summary on demand ---
+@app.event("app_mention")
+def handle_mention(event, say):
+    if "leaderboard" in event.get("text", "").lower():
+        say(build_message(fetch_top(supabase)))
 
 # --- HTTP server with leaderboard ---
 class LeaderboardHandler(BaseHTTPRequestHandler):
