@@ -6,6 +6,10 @@ from dotenv import load_dotenv
 
 MEDALS = {1: "🥇", 2: "🥈", 3: "🥉"}
 
+def fetch_top(supabase):
+    """Top 10 snipers, highest count first."""
+    return supabase.table("snipes").select("user_id, username, count").order("count", desc=True).limit(10).execute().data
+
 def build_message(rows):
     """Format leaderboard rows (ordered by count desc) as a Slack message."""
     if not rows:
@@ -23,9 +27,7 @@ def send_summary():
         sys.exit("Error: SLACK_CHANNEL_ID must be set")
 
     supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
-    rows = supabase.table("snipes").select("user_id, username, count").order("count", desc=True).limit(10).execute().data
-
-    WebClient(token=os.getenv("SLACK_BOT_TOKEN")).chat_postMessage(channel=channel, text=build_message(rows))
+    WebClient(token=os.getenv("SLACK_BOT_TOKEN")).chat_postMessage(channel=channel, text=build_message(fetch_top(supabase)))
     print("Weekly summary posted.")
 
 if __name__ == "__main__":
