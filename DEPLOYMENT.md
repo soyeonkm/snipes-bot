@@ -265,7 +265,7 @@ If Row Level Security is enabled on this table, add a policy that allows inserts
 
 ## Weekly Leaderboard Summary
 
-`weekly_summary.py` posts the top 10 all-time leaderboard to a Slack channel. Run it as a Northflank Cron Job the same way as the heartbeat:
+`weekly_summary.py` posts the top 5 all-time leaderboard to a Slack channel. Run it as a Northflank Cron Job the same way as the heartbeat:
 
 1. **Cron schedule**: e.g. Mondays at 9am UTC: `0 9 * * 1`.
 2. **CMD override**: `python /app/weekly_summary.py`
