@@ -111,7 +111,7 @@ def handle_message(event, say, client, logger):
 @app.event("app_mention")
 def handle_mention(event, say):
     if "leaderboard" in event.get("text", "").lower():
-        say(build_message(fetch_top(supabase)))
+        say(**build_message(fetch_top(supabase)))
 
 # --- HTTP server with leaderboard ---
 class LeaderboardHandler(BaseHTTPRequestHandler):
