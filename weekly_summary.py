@@ -8,8 +8,8 @@ MEDALS = {1: "🥇", 2: "🥈", 3: "🥉"}
 PAD = "\u2002"  # en space, nudges "4." / "5." right to line up with the medal emojis
 
 def fetch_top(supabase):
-    """Top 5 snipers, highest count first."""
-    return supabase.table("snipes").select("user_id, username, count").order("count", desc=True).limit(5).execute().data
+    """Top 5 snipers, highest count first; ties go to whoever reached the count first."""
+    return supabase.table("snipes").select("user_id, username, count").order("count", desc=True).order("updated_at").limit(5).execute().data
 
 def build_message(rows):
     """Format leaderboard rows (ordered by count desc) as Slack message kwargs (text + blocks)."""
