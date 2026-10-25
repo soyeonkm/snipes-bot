@@ -1,25 +1,23 @@
 import os
 import sys
-from datetime import date
 from slack_sdk import WebClient
 from supabase import create_client
 from dotenv import load_dotenv
 
 MEDALS = {1: "🥇", 2: "🥈", 3: "🥉"}
+PAD = "\u2002"  # en space, nudges "4." / "5." right to line up with the medal emojis
 
 def fetch_top(supabase):
     """Top 5 snipers, highest count first."""
     return supabase.table("snipes").select("user_id, username, count").order("count", desc=True).limit(5).execute().data
 
-def build_message(rows, subtitle=None):
+def build_message(rows):
     """Format leaderboard rows (ordered by count desc) as Slack message kwargs (text + blocks)."""
     body = "\n".join(
-        f"{MEDALS.get(i, f'{i}.')} {row.get('username') or row['user_id']}: *{row['count']}* {'snipe' if row['count'] == 1 else 'snipes'}"
+        f"{MEDALS.get(i, f'{PAD}{i}.')} {row.get('username') or row['user_id']}: *{row['count']}* {'snipe' if row['count'] == 1 else 'snipes'}"
         for i, row in enumerate(rows, 1)
     ) or "Nothing yet! Start sniping people!"
-    blocks = [{"type": "header", "text": {"type": "plain_text", "text": "🎯 Snipes Leaderboard"}}]
-    if subtitle:
-        blocks.append({"type": "context", "elements": [{"type": "mrkdwn", "text": subtitle}]})
+    blocks = [{"type": "header", "text": {"type": "plain_text", "text": "🏆 Snipes Leaderboard"}}]
     blocks += [{"type": "divider"}, {"type": "section", "text": {"type": "mrkdwn", "text": body}}]
     # text is the notification/fallback version of the blocks
     return {"text": "🏆 *Snipes Leaderboard*\n" + body, "blocks": blocks}
@@ -31,8 +29,7 @@ def send_summary():
         sys.exit("Error: SLACK_CHANNEL_ID must be set")
 
     supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
-    today = date.today()
-    WebClient(token=os.getenv("SLACK_BOT_TOKEN")).chat_postMessage(channel=channel, **build_message(fetch_top(supabase), f"Week of {today:%b} {today.day}"))
+    WebClient(token=os.getenv("SLACK_BOT_TOKEN")).chat_postMessage(channel=channel, **build_message(fetch_top(supabase)))
     print("Weekly summary posted.")
 
 if __name__ == "__main__":
